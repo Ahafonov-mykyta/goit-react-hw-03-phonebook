@@ -49,39 +49,24 @@ export default class App extends React.Component {
     }));
   };
 
-  handleChange = event => {
-    this.setState({
-      [event.currentTarget.name]: event.currentTarget.value,
-    });
-  };
-
   onFilter = () => {
-    if (this.state.filter === '') {
-      return;
-    }
+    this.setState({ filteredContacts: [] });
 
-    return this.state.contacts.map(contact => {
+    this.state.contacts.map(contact => {
       if (
         contact.name.toLowerCase().includes(this.state.filter.toLowerCase())
       ) {
-        return (
-          <li>
-            <p key={contact.id}>
-              {contact.name} : {contact.number}
-            </p>
-            <button
-              className="btn-delete"
-              type="button"
-              onClick={() => {
-                this.onDelete(contact.id);
-              }}
-            >
-              Delete
-            </button>
-          </li>
-        );
+        this.setState(prevState => ({
+          filteredContacts: [...prevState.filteredContacts, contact],
+        }));
       }
       return null;
+    });
+  };
+
+  handleChange = event => {
+    this.setState({ filter: event.currentTarget.value }, () => {
+      this.onFilter();
     });
   };
 
@@ -93,8 +78,9 @@ export default class App extends React.Component {
         <h2 className="title">Contacts</h2>
         <Filter
           handleChange={this.handleChange}
-          value={this.state.filter}
-          onFilter={this.onFilter}
+          filter={this.state.filter}
+          filteredContacts={this.state.filteredContacts}
+          onDelete={this.onDelete}
         />
 
         <ContactList
